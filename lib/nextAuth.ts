@@ -14,12 +14,12 @@ export const nextAuthOptions = {
             password: credentials.password
           });
 
-          if (response.data && response.data.access_token) {
-            data.accessToken = response.data.accessToken;
+          const data = response.data
+
+          if (data) {
             data.role = "admin"
             return data;
           }
-
           return null;
         } catch {
           return null;
