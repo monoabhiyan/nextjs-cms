@@ -1,10 +1,10 @@
 import {createMiddleware} from "next-safe-action";
-import {AuthOptions, getServerSession} from "next-auth";
+import { getServerSession} from "next-auth";
 import {ActionError} from "@/lib/auth/actions";
 import {nextAuthOptions} from "@/lib/nextAuth";
 
 export const authenticationMiddleware = createMiddleware().define(async ({next}) => {
-  const session = await getServerSession(nextAuthOptions as AuthOptions);
+  const session = await getServerSession(nextAuthOptions);
   if (!session) {
     throw new ActionError('Unauthorized');
   }

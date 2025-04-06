@@ -9,12 +9,12 @@ import {
 } from "@/components/ui/sidebar"
 
 import data from "./data.json"
-import {AuthOptions, getServerSession} from "next-auth";
+import {getServerSession} from "next-auth";
 import {nextAuthOptions} from "@/lib/nextAuth";
 import {redirect} from "next/navigation";
 
 export default async function Page() {
-  const session = await getServerSession(nextAuthOptions as AuthOptions)
+  const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
     redirect('/login');

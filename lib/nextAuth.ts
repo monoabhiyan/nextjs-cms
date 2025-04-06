@@ -2,8 +2,9 @@
 // @ts-nocheck
 import CredentialsProvider from 'next-auth/providers/credentials'
 import axios from 'axios';
+import {NextAuthOptions} from "next-auth";
 
-export const nextAuthOptions = {
+export const nextAuthOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',

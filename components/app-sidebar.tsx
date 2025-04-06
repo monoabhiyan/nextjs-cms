@@ -32,6 +32,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import {Suspense} from "react";
 
 const data = {
   user: {
@@ -174,7 +175,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <Suspense>
+          <NavUser user={data.user} />
+        </Suspense>
       </SidebarFooter>
     </Sidebar>
   )
