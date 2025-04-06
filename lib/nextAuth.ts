@@ -30,6 +30,21 @@ export const nextAuthOptions = {
   ],
   callbacks: {
     async jwt({token, user, account}) {
+      /**
+       * Enhancement can be done here
+       *      if (user) {
+       *         const {data: dbUser} = await axios.get(`${process.env.NEXT_BASE_URL}/users/${user.id}`);
+       *         if (dbUser) {
+       *           token.role = dbUser.role;
+       *           // Fetch permissions (e.g., from a related table or field)
+       *           token.permissions = dbUser.permissions || ["canViewReports"]; // Example
+       *         } else {
+       *           token.role = "USER";
+       *           token.permissions = [];
+       *         }
+       *       }
+       *      return token;
+       */
       if (user) {
         token.id = user.id
         token.role = user.role
