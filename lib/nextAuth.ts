@@ -14,14 +14,15 @@ export const nextAuthOptions = {
             password: credentials.password
           });
 
-          const data = response.data
+          const data = response.data;
 
           if (data) {
             data.role = "admin"
             return data;
           }
           return null;
-        } catch {
+        } catch (error) {
+          console.log(error)
           return null;
         }
       }

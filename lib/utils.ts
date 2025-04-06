@@ -3,6 +3,7 @@ import {twMerge} from "tailwind-merge"
 import {SafeActionResult} from 'next-safe-action';
 import {z} from "zod";
 import {ActionError} from "@/lib/auth/actions";
+import {SignInResponse} from "next-auth/react";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -56,3 +57,7 @@ export const resolveActionResult = async <T extends z.ZodType>(
     }
   });
 };
+
+export const isSignInResponseSuccessful = (signInResponse: SignInResponse) => {
+  return signInResponse.ok && signInResponse.error === null;
+}

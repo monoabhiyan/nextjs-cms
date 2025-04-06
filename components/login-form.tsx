@@ -1,6 +1,6 @@
 "use client";
 
-import {cn} from "@/lib/utils"
+import {cn, isActionSuccessful, isSignInResponseSuccessful} from "@/lib/utils"
 import {Button} from "@/components/ui/button"
 import {
   Card,
@@ -11,32 +11,52 @@ import {
 } from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
-import {signIn} from "next-auth/react";
 import {useRouter, useSearchParams} from "next/navigation";
+import {signIn, SignInResponse} from "next-auth/react";
+import {ActionError} from "@/lib/auth/actions";
+import {$loginInAction} from "@/app/login/action";
 import {useTransition} from "react";
 
 export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
   const router = useRouter();
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
-  const [isPending, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition()
 
-  async function $signIn(formData: FormData) {
-    if (!formData.get('username')) return;
+  async function $handleLogin(formData: FormData) {
     startTransition(async () => {
       try {
-        const response = await signIn('credentials', {
-          username: formData.get('username'),
-          password: formData.get('password'),
+        const formInput = {
+          username: formData.get('username') as string,
+          password: formData.get('password') as string,
+        }
+
+        const actionResponse = await $loginInAction(formInput);
+
+        if (!isActionSuccessful(actionResponse as never)) {
+          if (actionResponse?.validationErrors) {
+            console.log('validation error:', actionResponse?.validationErrors);
+            throw new ActionError(actionResponse?.validationErrors.toString());
+          }
+          if (actionResponse?.serverError) {
+            console.log('server error:', actionResponse?.serverError);
+            throw new ActionError(actionResponse?.serverError ?? 'Something went wrong');
+          }
+          return;
+        }
+
+        const signInResponse = await signIn('credentials', {
+          ...actionResponse?.data,
           redirect: false,
           callbackUrl,
         });
-        if (response?.ok && !response?.error) {
+
+        if (isSignInResponseSuccessful(signInResponse as SignInResponse)) {
           router.push(callbackUrl);
         }
       } catch (error) {
-        console.log({error});
+        console.error("Unexpected error: ", error);
       }
     })
   }
@@ -51,7 +71,7 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={$signIn}>
+          <form action={$handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="username">Username</Label>
@@ -59,7 +79,6 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
                   id="username"
                   name="username"
                   placeholder="user123"
-                  required
                   defaultValue="emilys"
                 />
               </div>
@@ -77,7 +96,7 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
-                  {isPending ? 'Logging..' : 'Login'}
+                  {isPending ? 'Logging...' : 'Login'}
                 </Button>
                 <Button variant="outline" className="hidden w-full">
                   Login with Google

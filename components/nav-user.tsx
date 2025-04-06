@@ -29,17 +29,28 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import {signOut} from "next-auth/react";
+import {useRouter, useSearchParams} from "next/navigation";
 
-export function NavUser({
-                          user,
-                        }: {
+export function NavUser({user}: {
   user: {
     name: string
     email: string
     avatar: string
   }
 }) {
-  const {isMobile} = useSidebar()
+  const {isMobile} = useSidebar();
+
+  const router = useRouter();
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+
+  async function $handleLogout() {
+    await signOut({
+      redirect: false,
+      callbackUrl,
+    });
+    router.push(callbackUrl);
+  }
 
   return (
     <SidebarMenu>
@@ -99,7 +110,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator/>
-            <DropdownMenuItem onClick={async () => await signOut()}>
+            <DropdownMenuItem onClick={$handleLogout}>
               <IconLogout/>
               Log out
             </DropdownMenuItem>

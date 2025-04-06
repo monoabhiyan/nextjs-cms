@@ -16,6 +16,7 @@ export const actionClient = createSafeActionClient({
     } else if (error instanceof ActionError) {
       return error.message;
     }
+    console.log(error);
     return DEFAULT_SERVER_ERROR_MESSAGE;
   },
 });
