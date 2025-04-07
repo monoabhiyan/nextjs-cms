@@ -9,7 +9,7 @@ const routeConfigs: RouteConfig[] = [
   {
     pattern: /^\/(login|signup)?$/,
     access: "public",
-    redirectIfAuthenticated: "/dashboard", // Redirect logged-in users to dashboard
+    redirectIfAuthenticated: "/admin/dashboard", // Redirect logged-in users to dashboard
   },
   {
     pattern: /^\/$/,
@@ -17,13 +17,13 @@ const routeConfigs: RouteConfig[] = [
   },
   // Private routes
   {
-    pattern: /^\/dashboard/,
+    pattern: /^\/admin\/dashboard/,
     access: "private",
     roles: ["user", "admin"],
     redirectTo: "/unauthorized",
   },
   {
-    pattern: /^\/profile/,
+    pattern: /^\/admin\/profile/,
     access: "private",
     roles: ["user", "admin"],
     redirectTo: "/unauthorized",

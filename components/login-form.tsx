@@ -20,7 +20,7 @@ import {useTransition} from "react";
 export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
   const router = useRouter();
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const callbackUrl = searchParams.get('callbackUrl') || '/admin/dashboard';
 
   const [isPending, startTransition] = useTransition()
 

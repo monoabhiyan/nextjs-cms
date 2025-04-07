@@ -42,7 +42,7 @@ export function NavUser({user}: {
 
   const router = useRouter();
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const callbackUrl = searchParams.get('callbackUrl') || '/admin/dashboard';
 
   async function $handleLogout() {
     await signOut({
