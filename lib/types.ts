@@ -7,3 +7,5 @@ export type RouteConfig = {
   redirectTo?: string; // Custom redirect if unauthorized
   redirectIfAuthenticated?: string;
 }
+
+export type Children = Readonly<{ children: React.ReactNode }>
