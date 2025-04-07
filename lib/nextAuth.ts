@@ -1,40 +1,40 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import CredentialsProvider from 'next-auth/providers/credentials'
-import axios from 'axios';
-import {NextAuthOptions} from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { NextAuthOptions } from "next-auth";
+import { Axios } from "@/lib/utils";
 
 export const nextAuthOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: 'Credentials',
+      name: "Credentials",
       async authorize(credentials) {
         try {
-          const response = await axios.post(`${process.env.NEXT_BASE_URL}/auth/login`, {
+          const response = await Axios.post(`/auth/login`, {
             username: credentials.username,
-            password: credentials.password
+            password: credentials.password,
           });
 
           const data = response.data;
 
           if (data) {
-            data.role = "admin"
+            data.role = "admin";
             return data;
           }
           return null;
         } catch (error) {
-          console.log(error)
+          console.log(error);
           return null;
         }
-      }
-    })
+      },
+    }),
   ],
   callbacks: {
-    async jwt({token, user, account}) {
+    async jwt({ token, user, account }) {
       /**
        * Enhancement can be done here
        *      if (user) {
-       *         const {data: dbUser} = await axios.get(`${process.env.NEXT_BASE_URL}/users/${user.id}`);
+       *         const {data: dbUser} = await Axios.get(`/users/${user.id}`);
        *         if (dbUser) {
        *           token.role = dbUser.role;
        *           // Fetch permissions (e.g., from a related table or field)
@@ -47,29 +47,29 @@ export const nextAuthOptions: NextAuthOptions = {
        *      return token;
        */
       if (user) {
-        token.id = user.id
-        token.role = user.role
+        token.id = user.id;
+        token.role = user.role;
       }
-      if (account?.provider === 'credentials') {
+      if (account?.provider === "credentials") {
         return {
           ...token,
           role: user.role,
-          accessToken: user.accessToken
-        }
+          accessToken: user.accessToken,
+        };
       }
-      return token
+      return token;
     },
-    async session({session, token}) {
-      session.user.id = token.id
-      session.accessToken = token.accessToken
-      return session
-    }
+    async session({ session, token }) {
+      session.user.id = token.id;
+      session.accessToken = token.accessToken;
+      return session;
+    },
   },
   pages: {
-    signIn: '/login'
+    signIn: "/login",
   },
   session: {
-    strategy: 'jwt'
+    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET as string,
-}
+};

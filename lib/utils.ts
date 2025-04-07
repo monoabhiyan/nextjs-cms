@@ -3,7 +3,8 @@ import { twMerge } from "tailwind-merge";
 import { z } from "zod";
 import { ActionError } from "@/lib/auth/actions";
 import { SignInResponse } from "next-auth/react";
-import {  ActionResult, ActionSuccess } from "@/lib/types";
+import { ActionResult, ActionSuccess } from "@/lib/types";
+import axios from "axios";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -72,8 +73,6 @@ export const hasValidationErrors = <T extends z.ZodType>(
   return false;
 };
 
-
-
 /**
  * Converts an action result to a promise that resolves to false
  *
@@ -101,3 +100,11 @@ export const resolveActionResult = async <T extends z.ZodType>(
 export const isSignInResponseSuccessful = (signInResponse: SignInResponse) => {
   return signInResponse.ok && signInResponse.error === null;
 };
+
+export const Axios = axios.create({
+  baseURL: process.env.NEXT_BASE_URL,
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+});
