@@ -52,11 +52,11 @@ export function LoginForm({
         )) as ActionResult<z.ZodType<LoginSchema>>;
 
         if (!isActionSuccessful(actionResponse)) {
-          if (actionResponse?.validationErrors) {
+          if (hasValidationErrors(actionResponse)) {
             console.log("validation error:", actionResponse?.validationErrors);
             throw new ActionError(String(actionResponse?.validationErrors));
           }
-          if (actionResponse?.serverError) {
+          if (hasServerError(actionResponse)) {
             console.log("server error:", actionResponse?.serverError);
             throw new ActionError(
               actionResponse?.serverError ?? "Something went wrong",
@@ -80,22 +80,8 @@ export function LoginForm({
     });
   }
 
-  const $handleS = async () => {
-    const response = (await $requireLoginAction()) as ActionResult<z.ZodType>;
-    if (!isActionSuccessful(response)) {
-      if (hasServerError(response)) {
-        console.log("server error:", response.serverError);
-        return;
-      }
-      if (hasValidationErrors(response)) {
-        console.log("validation error:", response.validationErrors);
-        return;
-      }
-    }
-  };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Button onClick={$handleS}>Require authentication</Button>
       <Card>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
