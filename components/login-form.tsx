@@ -22,7 +22,6 @@ import { signIn, SignInResponse } from "next-auth/react";
 import { ActionError } from "@/lib/auth/actions";
 import {
   $loginInAction,
-  $requireLoginAction,
   LoginSchema,
 } from "@/app/login/action";
 import { useTransition } from "react";
