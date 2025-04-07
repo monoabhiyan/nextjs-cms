@@ -20,26 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Suspense } from "react";
 import Link from "next/link";
-
-export const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/admin/dashboard",
-      icon: IconDashboard,
-    },
-    {
-      title: "Products",
-      url: "/admin/products",
-      icon: IconListDetails,
-    },
-  ],
-};
+import { adminSideBarData } from "@/lib/constants";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -60,11 +41,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={adminSideBarData.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <Suspense>
-          <NavUser user={data.user} />
+          <NavUser user={adminSideBarData.user} />
         </Suspense>
       </SidebarFooter>
     </Sidebar>

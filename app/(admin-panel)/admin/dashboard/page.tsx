@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { nextAuthOptions } from "@/lib/nextAuth";
 import { redirect } from "next/navigation";
-import AdminPanelXSpacer from "@/app/(admin-panel)/admin/dashboard/AdminPanelXSpacer";
+import AdminPanelXSpacer from "@/app/(admin-panel)/admin/AdminPanelXSpacer";
 
 export default async function Page() {
   const session = await getServerSession(nextAuthOptions);

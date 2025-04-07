@@ -1,52 +1,71 @@
 "use client";
 
-import {cn, isActionSuccessful, isSignInResponseSuccessful} from "@/lib/utils"
-import {Button} from "@/components/ui/button"
+import {
+  cn,
+  hasServerError,
+  hasValidationErrors,
+  isActionSuccessful,
+  isSignInResponseSuccessful,
+} from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import {Input} from "@/components/ui/input"
-import {Label} from "@/components/ui/label"
-import {useRouter, useSearchParams} from "next/navigation";
-import {signIn, SignInResponse} from "next-auth/react";
-import {ActionError} from "@/lib/auth/actions";
-import {$loginInAction} from "@/app/login/action";
-import {useTransition} from "react";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn, SignInResponse } from "next-auth/react";
+import { ActionError } from "@/lib/auth/actions";
+import {
+  $loginInAction,
+  $requireLoginAction,
+  LoginSchema,
+} from "@/app/login/action";
+import { useTransition } from "react";
+import { ActionResult } from "@/lib/types";
+import { z } from "zod";
 
-export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   const router = useRouter();
-  const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/admin/dashboard';
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/admin/dashboard";
 
-  const [isPending, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition();
 
   async function $handleLogin(formData: FormData) {
     startTransition(async () => {
       try {
         const formInput = {
-          username: formData.get('username') as string,
-          password: formData.get('password') as string,
-        }
+          username: formData.get("username") as string,
+          password: formData.get("password") as string,
+        };
 
-        const actionResponse = await $loginInAction(formInput);
+        const actionResponse = (await $loginInAction(
+          formInput,
+        )) as ActionResult<z.ZodType<LoginSchema>>;
 
-        if (!isActionSuccessful(actionResponse as never)) {
+        if (!isActionSuccessful(actionResponse)) {
           if (actionResponse?.validationErrors) {
-            console.log('validation error:', actionResponse?.validationErrors);
-            throw new ActionError(actionResponse?.validationErrors.toString());
+            console.log("validation error:", actionResponse?.validationErrors);
+            throw new ActionError(String(actionResponse?.validationErrors));
           }
           if (actionResponse?.serverError) {
-            console.log('server error:', actionResponse?.serverError);
-            throw new ActionError(actionResponse?.serverError ?? 'Something went wrong');
+            console.log("server error:", actionResponse?.serverError);
+            throw new ActionError(
+              actionResponse?.serverError ?? "Something went wrong",
+            );
           }
           return;
         }
 
-        const signInResponse = await signIn('credentials', {
+        const signInResponse = await signIn("credentials", {
           ...actionResponse?.data,
           redirect: false,
           callbackUrl,
@@ -58,11 +77,25 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
       } catch (error) {
         console.error("Unexpected error: ", error);
       }
-    })
+    });
   }
 
+  const $handleS = async () => {
+    const response = (await $requireLoginAction()) as ActionResult<z.ZodType>;
+    if (!isActionSuccessful(response)) {
+      if (hasServerError(response)) {
+        console.log("server error:", response.serverError);
+        return;
+      }
+      if (hasValidationErrors(response)) {
+        console.log("validation error:", response.validationErrors);
+        return;
+      }
+    }
+  };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Button onClick={$handleS}>Require authentication</Button>
       <Card>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
@@ -92,11 +125,17 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
                     Forgot your password?
                   </a>
                 </div>
-                <Input name="password" defaultValue="emilyspass" id="password" type="password" required/>
+                <Input
+                  name="password"
+                  defaultValue="emilyspass"
+                  id="password"
+                  type="password"
+                  required
+                />
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
-                  {isPending ? 'Logging...' : 'Login'}
+                  {isPending ? "Logging..." : "Login"}
                 </Button>
                 <Button variant="outline" className="hidden w-full">
                   Login with Google
@@ -113,5 +152,5 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

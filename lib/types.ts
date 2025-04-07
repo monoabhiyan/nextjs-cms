@@ -1,3 +1,6 @@
+import {SafeActionResult} from "next-safe-action";
+import {z} from "zod";
+
 export type Role = "user" | "admin" | "guest";
 
 export type RouteConfig = {
@@ -9,3 +12,11 @@ export type RouteConfig = {
 }
 
 export type Children = Readonly<{ children: React.ReactNode }>
+
+export type ActionResult<T extends z.ZodType> = SafeActionResult<string, T, readonly [], never, never>
+
+export type ActionSuccess<T> = {
+  data: T;
+  serverError: undefined;
+  validationErrors: undefined
+}
