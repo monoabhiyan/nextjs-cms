@@ -2,9 +2,7 @@
 
 import * as React from "react";
 import {
-  IconDashboard,
   IconInnerShadowTop,
-  IconListDetails,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/nav-main";
