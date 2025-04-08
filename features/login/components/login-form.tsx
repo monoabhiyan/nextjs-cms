@@ -20,10 +20,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, SignInResponse } from "next-auth/react";
 import { ActionError } from "@/lib/auth/actions";
-import {
-  $loginInAction,
-  LoginSchema,
-} from "@/app/login/action";
+import { $loginInAction, LoginSchema } from "@/features/login/actions";
 import { useTransition } from "react";
 import { ActionResult } from "@/lib/types";
 import { z } from "zod";
@@ -85,7 +82,7 @@ export function LoginForm({
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your username and password to login to your account
           </CardDescription>
         </CardHeader>
         <CardContent>

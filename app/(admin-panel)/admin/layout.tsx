@@ -1,27 +1,24 @@
-import {redirect} from "next/navigation";
-import {getServerSession} from "next-auth";
-import type {Metadata} from "next";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import type { Metadata } from "next";
 
-import {AppSidebar} from "@/components/app-sidebar"
-import {SiteHeader} from "@/components/site-header"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-import {nextAuthOptions} from "@/lib/nextAuth";
-import AdminPanelContainer from "@/app/(admin-panel)/admin/AdminPanelContainer";
-import {Children} from "@/lib/types";
+import { nextAuthOptions } from "@/lib/nextAuth";
+import AdminPanelContainer from "@/features/admin/components/AdminPanelContainer";
+import { Children } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
   description: "Admin panel - admin cms",
 };
-export default async function AdminLayout({children}: Children) {
-  const session = await getServerSession(nextAuthOptions)
+export default async function AdminLayout({ children }: Children) {
+  const session = await getServerSession(nextAuthOptions);
 
   if (!session) {
-    redirect('/login');
+    redirect("/login");
   }
 
   return (
@@ -33,14 +30,11 @@ export default async function AdminLayout({children}: Children) {
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset"/>
+      <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader/>
-        <AdminPanelContainer>
-          {children}
-        </AdminPanelContainer>
+        <SiteHeader />
+        <AdminPanelContainer>{children}</AdminPanelContainer>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }
-
