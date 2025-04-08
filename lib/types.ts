@@ -1,5 +1,5 @@
-import {SafeActionResult} from "next-safe-action";
-import {z} from "zod";
+import { SafeActionResult, ValidationErrors } from "next-safe-action";
+import { z } from "zod";
 
 export type Role = "user" | "admin" | "guest";
 
@@ -9,14 +9,20 @@ export type RouteConfig = {
   roles?: Role[]; // Required roles (if private)
   redirectTo?: string; // Custom redirect if unauthorized
   redirectIfAuthenticated?: string;
-}
+};
 
-export type Children = Readonly<{ children: React.ReactNode }>
+export type Children = Readonly<{ children: React.ReactNode }>;
 
-export type ActionResult<T extends z.ZodType> = SafeActionResult<string, T, readonly [], never, never>
+export type ActionResult<T extends z.Schema> = SafeActionResult<
+  string,
+  T,
+  readonly [],
+  ValidationErrors<T>,
+  never
+>;
 
-export type ActionSuccess<T> = {
+export type ActionSuccess<T extends z.Schema> = {
   data: T;
   serverError: undefined;
-  validationErrors: undefined
-}
+  validationErrors: ValidationErrors<T>;
+};

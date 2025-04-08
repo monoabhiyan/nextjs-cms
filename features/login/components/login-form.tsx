@@ -45,7 +45,7 @@ export function LoginForm({
 
         const actionResponse = (await $loginInAction(
           formInput,
-        )) as ActionResult<z.ZodType<LoginSchema>>;
+        )) as ActionResult<z.Schema<LoginSchema>>;
 
         if (!isActionSuccessful(actionResponse)) {
           if (hasValidationErrors(actionResponse)) {

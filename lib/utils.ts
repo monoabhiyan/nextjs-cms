@@ -17,7 +17,7 @@ export function cn(...inputs: ClassValue[]) {
  * @param action Return value of a server action
  * @returns A boolean indicating if the action is successful
  */
-export const isActionSuccessful = <T extends z.ZodType>(
+export const isActionSuccessful = <T extends z.Schema>(
   action?: ActionResult<T>,
 ): action is ActionSuccess<T> => {
   if (!action) {
@@ -42,7 +42,7 @@ export const isActionSuccessful = <T extends z.ZodType>(
  * @param action Return value of a server action
  * @returns A true boolean for error cases.
  */
-export const hasServerError = <T extends z.ZodType>(
+export const hasServerError = <T extends z.Schema>(
   action?: ActionResult<T>,
 ): boolean => {
   if (!action) {
@@ -61,7 +61,7 @@ export const hasServerError = <T extends z.ZodType>(
  * @param action Return value of a server action
  * @returns A true for error cases
  */
-export const hasValidationErrors = <T extends z.ZodType>(
+export const hasValidationErrors = <T extends z.Schema>(
   action?: ActionResult<T>,
 ): boolean => {
   if (!action) {
