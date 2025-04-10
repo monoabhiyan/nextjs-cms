@@ -23,6 +23,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import * as React from "react";
+import { useMemo } from "react";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
@@ -40,8 +41,9 @@ export function DataTableFacetedFilter<TData, TValue>({
   const [open, setOpen] = React.useState(false);
 
   const columnFilterValue = column?.getFilterValue();
-  const selectedValues = new Set(
-    Array.isArray(columnFilterValue) ? columnFilterValue : [],
+  const selectedValues = useMemo(
+    () => new Set(Array.isArray(columnFilterValue) ? columnFilterValue : []),
+    [columnFilterValue],
   );
 
   const onItemSelect = React.useCallback(

@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { z } from "zod";
 import { ActionError } from "@/lib/auth/actions";
 import { SignInResponse } from "next-auth/react";
-import {ActionResult, ActionSuccess, Payment} from "@/lib/types";
+import { ActionResult, ActionSuccess } from "@/lib/types";
 import axios from "axios";
 
 export function cn(...inputs: ClassValue[]) {

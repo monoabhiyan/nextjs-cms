@@ -363,7 +363,7 @@ function DataTableFilterItem<TData>({
 
     const columnMeta = column.columnDef.meta;
     const filterOperators = getFilterOperators(filter.variant);
-
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const onItemKeyDown = React.useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (
