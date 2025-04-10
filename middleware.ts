@@ -1,8 +1,8 @@
 // middleware.ts
-import {withAuth} from "next-auth/middleware";
-import {NextResponse} from "next/server";
-import type {NextRequest} from "next/server";
-import {Role, RouteConfig} from "@/lib/types";
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { Role, RouteConfig } from "@/lib/types";
 
 const routeConfigs: RouteConfig[] = [
   // Public routes
@@ -29,6 +29,26 @@ const routeConfigs: RouteConfig[] = [
     redirectTo: "/unauthorized",
   },
   {
+    pattern: /^\/admin\/projects/,
+    access: "private",
+    roles: ["user", "admin"],
+    redirectTo: "/unauthorized",
+  },
+  {
+    pattern: /^\/admin\/products/,
+    access: "private",
+    roles: ["user", "admin"],
+    redirectTo: "/unauthorized",
+  },
+  {
+    pattern: /^\/admin\/orders/,
+    access: "private",
+    roles: ["user", "admin"],
+    redirectTo: "/unauthorized",
+  },
+
+  // add admin related routes above
+  {
     pattern: /^\/admin/,
     access: "private",
     roles: ["admin"],
@@ -43,7 +63,10 @@ const routeConfigs: RouteConfig[] = [
   },
 ];
 
-const hasRequiredRole = (userRole: Role | undefined, requiredRoles: Role[]): boolean => {
+const hasRequiredRole = (
+  userRole: Role | undefined,
+  requiredRoles: Role[],
+): boolean => {
   if (!userRole) return false;
   return requiredRoles.includes(userRole);
 };
@@ -51,7 +74,7 @@ const hasRequiredRole = (userRole: Role | undefined, requiredRoles: Role[]): boo
 // Middleware using withAuth
 export default withAuth(
   function middleware(req: NextRequest) {
-    const {pathname} = req.nextUrl;
+    const { pathname } = req.nextUrl;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     const session = req.nextauth.token; // Session data added by withAuth
@@ -59,7 +82,9 @@ export default withAuth(
     const userRole = session?.role as Role | undefined;
 
     // Find the matching route config
-    const routeConfig = routeConfigs.find((config) => config.pattern.test(pathname));
+    const routeConfig = routeConfigs.find((config) =>
+      config.pattern.test(pathname),
+    );
 
     if (!routeConfig) {
       // Fallback: treat as private if no config matches
@@ -70,7 +95,9 @@ export default withAuth(
     if (routeConfig.access === "public") {
       // Redirect authenticated users if specified
       if (session && routeConfig.redirectIfAuthenticated) {
-        return NextResponse.redirect(new URL(routeConfig.redirectIfAuthenticated, req.url));
+        return NextResponse.redirect(
+          new URL(routeConfig.redirectIfAuthenticated, req.url),
+        );
       }
       return NextResponse.next();
     }
@@ -86,7 +113,9 @@ export default withAuth(
 
       // Authenticated but wrong role: redirect to unauthorized
       if (routeConfig.roles && !hasRequiredRole(userRole, routeConfig.roles)) {
-        return NextResponse.redirect(new URL(routeConfig.redirectTo || "/unauthorized", req.url));
+        return NextResponse.redirect(
+          new URL(routeConfig.redirectTo || "/unauthorized", req.url),
+        );
       }
 
       // Authorized: allow access
@@ -102,7 +131,7 @@ export default withAuth(
         return true;
       },
     },
-  }
+  },
 );
 
 // Define which routes the middleware applies to

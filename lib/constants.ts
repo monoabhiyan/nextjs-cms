@@ -25,5 +25,10 @@ export const adminSideBarData = {
       url: "/admin/orders",
       icon: IconListDetails,
     },
+    {
+      title: "Projects",
+      url: "/admin/projects",
+      icon: IconListDetails,
+    }
   ],
 };
