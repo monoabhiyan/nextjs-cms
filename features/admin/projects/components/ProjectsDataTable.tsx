@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useDataTable } from "@/hooks/use-data-table";
 
-import type { Column, ColumnDef, SortingState } from "@tanstack/react-table";
+import type { Column, ColumnDef } from "@tanstack/react-table";
 import {
   CheckCircle,
   CheckCircle2,
