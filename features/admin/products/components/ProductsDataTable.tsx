@@ -14,7 +14,7 @@ import {
   ProductQueryInput,
 } from "@/features/admin/products/action";
 import { z } from "zod";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { getQueryClient } from "@/lib/react-query/QueryProviders";
 import { productsQueryKey } from "@/features/admin/products/constants";
 
@@ -37,10 +37,12 @@ export default function ProductsDataTable() {
   const [sort] = useQueryState("sort", sortParser.withDefault([]));
   const [perPage] = useQueryState("perPage", parseAsString.withDefault("10"));
 
-  const currentQueryInput: ProductQueryInput = {
-    sort,
-    perPage: perPage.toString(),
-  };
+  const currentQueryInput: ProductQueryInput = useMemo(() => {
+    return {
+      sort,
+      perPage: perPage.toString(),
+    };
+  }, [sort, perPage]);
 
   const { data } = useSuspenseQuery({
     queryKey: productsQueryKey,
