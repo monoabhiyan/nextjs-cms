@@ -6,13 +6,17 @@ import { DataTableToolbar } from "@/components/data-table-toolbar";
 
 import { useDataTable } from "@/hooks/use-data-table";
 
-import { parseAsString, useQueryState } from "nuqs";
+import { parseAsJson, useQueryState } from "nuqs";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { productColumns } from "@/features/admin/products/components/ProductsColumns";
 import {
   fetchProductsQuery,
   ProductQueryInput,
 } from "@/features/admin/products/action";
+import { z } from "zod";
+import { useEffect } from "react";
+import { getQueryClient } from "@/lib/react-query/QueryProviders";
+import { productsQueryKey } from "@/features/admin/products/constants";
 
 interface ProductsDataTableProps {
   initialQueryInput: ProductQueryInput;
@@ -21,25 +25,27 @@ interface ProductsDataTableProps {
 export default function ProductsDataTable({
   initialQueryInput,
 }: ProductsDataTableProps) {
-  const [title] = useQueryState("title", parseAsString.withDefault(""));
+  const queryClient = getQueryClient();
   // const [price] = useQueryState(
   //   "price",
   //   parseAsArrayOf(parseAsString).withDefault([]),
   // );
   //
-  // const sortingStateSchema = z.array(
-  //   z.object({
-  //     id: z.string(),
-  //     desc: z.boolean(),
-  //   }),
-  // );
+  const sortingStateSchema = z.array(
+    z.object({
+      id: z.string(),
+      desc: z.boolean(),
+    }),
+  );
 
+  const sortParser = parseAsJson(sortingStateSchema.parse);
+
+  const [sort] = useQueryState("sort", sortParser.withDefault([]));
   const currentQueryInput: ProductQueryInput = {
-    title: title || undefined,
+    sort,
   };
-  const queryKey = ["products", JSON.stringify(initialQueryInput)];
   const { data } = useSuspenseQuery({
-    queryKey: queryKey,
+    queryKey: productsQueryKey,
     // The queryFn is technically optional here if data is always hydrated,
     // but good practice to include for refetching, background updates etc.
     // It should ideally match the server's fetching logic.
@@ -53,6 +59,12 @@ export default function ProductsDataTable({
     },
     staleTime: 60 * 1000, // Match server staleTime or set as needed
   });
+
+  useEffect(() => {
+    queryClient.invalidateQueries({
+      queryKey: ["products"],
+    });
+  }, [currentQueryInput, queryClient]);
 
   const columns = React.useMemo(() => productColumns, []);
 

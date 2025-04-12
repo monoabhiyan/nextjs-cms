@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import { createSafeActionClient } from "next-safe-action";
 import {
   Axios,
   hasServerError,
@@ -10,29 +9,20 @@ import {
 } from "@/lib/utils"; // Your Axios instance
 import { Product } from "@/features/admin/products/types";
 import { actionClient, ActionError } from "@/lib/auth/actions";
-import { SortingState } from "@tanstack/react-table";
-import { ActionResult } from "@/lib/types";
+import {sortingStateSchema} from "@/features/admin/products/components/ProductServerComponent";
 
 // Define the schema for expected query parameters
 // Match the structure used by nuqs and tanstack table sorting
 const productQuerySchema = z.object({
   title: z.string().optional(),
   price: z.array(z.string()).optional(), // Assuming price filter allows multiple values
-  sort: z
-    .array(
-      z.object({
-        id: z.string(),
-        desc: z.boolean(),
-      }),
-    )
-    .optional(),
+  sort: sortingStateSchema,
   // Add other params like pagination if needed
   // page: z.number().optional().default(1),
   // limit: z.number().optional().default(10),
 });
 
 export type ProductQueryInput = z.infer<typeof productQuerySchema>;
-
 // Define the server action
 
 export const $fetchProductsAction = actionClient
@@ -49,8 +39,8 @@ export const $fetchProductsAction = actionClient
       // Assuming API expects _sort=field&_order=asc|desc
       // Adjust based on your actual API sorting mechanism
       const sortParam = inputParams.sort[0]; // Example: only handle first sort criteria
-      query.set("_sort", sortParam.id);
-      query.set("_order", sortParam.desc ? "desc" : "asc");
+      query.set("sortBy", sortParam.id);
+      query.set("order", sortParam.desc ? "desc" : "asc");
     }
 
     const queryString = query.toString();

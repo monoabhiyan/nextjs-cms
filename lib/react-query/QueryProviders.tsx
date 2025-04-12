@@ -1,7 +1,11 @@
 "use client";
 
 import React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  isServer,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 // Optional: If you want React Query DevTools
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -18,8 +22,8 @@ function makeQueryClient() {
 
 let browserQueryClient: QueryClient | undefined = undefined;
 
-function getQueryClient() {
-  if (typeof window === "undefined") {
+export function getQueryClient() {
+  if (isServer) {
     // Server: always make a new query client
     return makeQueryClient();
   } else {
