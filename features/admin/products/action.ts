@@ -9,7 +9,7 @@ import {
 } from "@/lib/utils"; // Your Axios instance
 import { Product } from "@/features/admin/products/types";
 import { actionClient, ActionError } from "@/lib/auth/actions";
-import { sortingStateSchema } from "@/features/admin/products/components/ProductServerComponent";
+import { sortingStateSchema } from "@/features/admin/products/schema";
 
 // Define the schema for expected query parameters
 // Match the structure used by nuqs and tanstack table sorting

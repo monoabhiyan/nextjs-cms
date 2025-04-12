@@ -13,10 +13,10 @@ import {
   fetchProductsQuery,
   ProductQueryInput,
 } from "@/features/admin/products/action";
-import { z } from "zod";
 import { useEffect, useMemo } from "react";
 import { getQueryClient } from "@/lib/react-query/QueryProviders";
 import { productsQueryKey } from "@/features/admin/products/constants";
+import { sortingStateSchema } from "@/features/admin/products/schema";
 
 export default function ProductsDataTable() {
   const queryClient = getQueryClient();
@@ -25,12 +25,6 @@ export default function ProductsDataTable() {
   //   parseAsArrayOf(parseAsString).withDefault([]),
   // );
   //
-  const sortingStateSchema = z.array(
-    z.object({
-      id: z.string(),
-      desc: z.boolean(),
-    }),
-  );
 
   const sortParser = parseAsJson(sortingStateSchema.parse);
 

@@ -8,20 +8,14 @@ import {
   ProductQueryInput,
 } from "@/features/admin/products/action";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { z } from "zod";
 import { productsQueryKey } from "@/features/admin/products/constants";
+import { sortingStateSchema } from "@/features/admin/products/schema";
 
 type ProductServerComponentProps = {
   searchParams?: ProductQueryInput;
 };
 
 // Define the Zod schema for sorting state again (or import if shared)
-export const sortingStateSchema = z.array(
-  z.object({
-    id: z.string(),
-    desc: z.boolean(),
-  }),
-);
 const sortParser = parseAsJson(sortingStateSchema.parse);
 
 type successParsing = string | undefined;
