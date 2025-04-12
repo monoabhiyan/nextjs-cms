@@ -6,7 +6,7 @@ import { DataTableToolbar } from "@/components/data-table-toolbar";
 
 import { useDataTable } from "@/hooks/use-data-table";
 
-import { parseAsJson, useQueryState } from "nuqs";
+import { parseAsJson, parseAsString, useQueryState } from "nuqs";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { productColumns } from "@/features/admin/products/components/ProductsColumns";
 import {
@@ -18,13 +18,7 @@ import { useEffect } from "react";
 import { getQueryClient } from "@/lib/react-query/QueryProviders";
 import { productsQueryKey } from "@/features/admin/products/constants";
 
-interface ProductsDataTableProps {
-  initialQueryInput: ProductQueryInput;
-}
-
-export default function ProductsDataTable({
-  initialQueryInput,
-}: ProductsDataTableProps) {
+export default function ProductsDataTable() {
   const queryClient = getQueryClient();
   // const [price] = useQueryState(
   //   "price",
@@ -41,9 +35,13 @@ export default function ProductsDataTable({
   const sortParser = parseAsJson(sortingStateSchema.parse);
 
   const [sort] = useQueryState("sort", sortParser.withDefault([]));
+  const [perPage] = useQueryState("perPage", parseAsString.withDefault("10"));
+
   const currentQueryInput: ProductQueryInput = {
     sort,
+    perPage: perPage.toString(),
   };
+
   const { data } = useSuspenseQuery({
     queryKey: productsQueryKey,
     // The queryFn is technically optional here if data is always hydrated,

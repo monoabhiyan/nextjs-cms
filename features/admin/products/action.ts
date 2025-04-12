@@ -9,7 +9,7 @@ import {
 } from "@/lib/utils"; // Your Axios instance
 import { Product } from "@/features/admin/products/types";
 import { actionClient, ActionError } from "@/lib/auth/actions";
-import {sortingStateSchema} from "@/features/admin/products/components/ProductServerComponent";
+import { sortingStateSchema } from "@/features/admin/products/components/ProductServerComponent";
 
 // Define the schema for expected query parameters
 // Match the structure used by nuqs and tanstack table sorting
@@ -19,7 +19,7 @@ const productQuerySchema = z.object({
   sort: sortingStateSchema,
   // Add other params like pagination if needed
   // page: z.number().optional().default(1),
-  // limit: z.number().optional().default(10),
+  perPage: z.string().optional().default("10"),
 });
 
 export type ProductQueryInput = z.infer<typeof productQuerySchema>;
@@ -41,6 +41,10 @@ export const $fetchProductsAction = actionClient
       const sortParam = inputParams.sort[0]; // Example: only handle first sort criteria
       query.set("sortBy", sortParam.id);
       query.set("order", sortParam.desc ? "desc" : "asc");
+    }
+
+    if (inputParams.perPage) {
+      query.set("limit", inputParams.perPage);
     }
 
     const queryString = query.toString();

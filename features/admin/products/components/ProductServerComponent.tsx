@@ -1,7 +1,7 @@
 import React from "react";
 import ProductsDataTable from "./ProductsDataTable";
 import getServerQueryClient from "@/lib/react-query/getQueryClient";
-import { parseAsJson } from "nuqs/server";
+import { parseAsJson, parseAsString } from "nuqs/server";
 
 import {
   fetchProductsQuery,
@@ -24,20 +24,27 @@ export const sortingStateSchema = z.array(
 );
 const sortParser = parseAsJson(sortingStateSchema.parse);
 
+type successParsing = string | undefined;
+
 export default async function ProductServerComponent({
   searchParams,
 }: ProductServerComponentProps) {
   const queryClient = getServerQueryClient();
   const sort = sortParser
     .withDefault([])
-    .parseServerSide(searchParams?.sort as string | undefined);
+    .parseServerSide(searchParams?.sort as successParsing);
   // const title = parseAsString.withDefault("").parse(searchParams?.title || "");
   // const price = parseAsArrayOf(parseAsString)
   //   .withDefault([])
   //   .parse(searchParams?.price);
 
+  const perPage = parseAsString
+    .withDefault("10")
+    .parseServerSide(searchParams?.perPage as successParsing);
+
   const queryInput: ProductQueryInput = {
     sort,
+    perPage,
   };
 
   await queryClient.prefetchQuery({
@@ -47,7 +54,7 @@ export default async function ProductServerComponent({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ProductsDataTable initialQueryInput={queryInput} />
+      <ProductsDataTable />
     </HydrationBoundary>
   );
 }
