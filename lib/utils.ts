@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { z } from "zod";
 import { ActionError } from "@/lib/auth/actions";
 import { SignInResponse } from "next-auth/react";
-import { ActionResult, ActionSuccess } from "@/lib/types";
+import { ActionResult } from "@/lib/types";
 import axios from "axios";
 
 export function cn(...inputs: ClassValue[]) {
@@ -17,18 +17,20 @@ export function cn(...inputs: ClassValue[]) {
  * @param action Return value of a server action
  * @returns A boolean indicating if the action is successful
  */
-export const isActionSuccessful = <T extends z.Schema>(
-  action?: ActionResult<T>,
-): action is ActionSuccess<T> => {
+export const isActionSuccessful = (action: unknown) => {
   if (!action) {
     return false;
   }
 
-  if (action.serverError) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  if (action?.serverError) {
     return false;
   }
 
-  if (action.validationErrors) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  if (action?.validationErrors) {
     return false;
   }
 
@@ -42,13 +44,13 @@ export const isActionSuccessful = <T extends z.Schema>(
  * @param action Return value of a server action
  * @returns A true boolean for error cases.
  */
-export const hasServerError = <T extends z.Schema>(
-  action?: ActionResult<T>,
-): boolean => {
+export const hasServerError = (action: unknown): boolean => {
   if (!action) {
     return true;
   }
-  if (action.serverError) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  if (action?.serverError) {
     return true;
   }
   return false;
@@ -61,13 +63,13 @@ export const hasServerError = <T extends z.Schema>(
  * @param action Return value of a server action
  * @returns A true for error cases
  */
-export const hasValidationErrors = <T extends z.Schema>(
-  action?: ActionResult<T>,
-): boolean => {
+export const hasValidationErrors = (action: unknown): boolean => {
   if (!action) {
     return true;
   }
-  if (action.validationErrors) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  if (action?.validationErrors) {
     return true;
   }
   return false;
@@ -87,7 +89,7 @@ export const resolveActionResult = async <T extends z.ZodType>(
       const result = await action;
 
       if (isActionSuccessful(result)) {
-        resolve(result.data);
+        resolve(result?.data as T);
       } else {
         reject(new ActionError(result?.serverError ?? "Something went wrong"));
       }

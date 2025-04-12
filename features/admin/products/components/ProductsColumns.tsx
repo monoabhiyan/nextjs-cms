@@ -49,7 +49,7 @@ export const productColumns: ColumnDef<Product>[] = [
       variant: "text",
       icon: Text,
     },
-    enableColumnFilter: true,
+    enableColumnFilter: false,
   },
   {
     id: "price",

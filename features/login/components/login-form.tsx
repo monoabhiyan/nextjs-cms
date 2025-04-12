@@ -43,9 +43,7 @@ export function LoginForm({
           password: formData.get("password") as string,
         };
 
-        const actionResponse = (await $loginInAction(
-          formInput,
-        )) as ActionResult<z.Schema<LoginSchema>>;
+        const actionResponse = await $loginInAction(formInput);
 
         if (!isActionSuccessful(actionResponse)) {
           if (hasValidationErrors(actionResponse)) {

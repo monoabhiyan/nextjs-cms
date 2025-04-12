@@ -6,56 +6,58 @@ import { DataTableToolbar } from "@/components/data-table-toolbar";
 
 import { useDataTable } from "@/hooks/use-data-table";
 
-import {
-  parseAsArrayOf,
-  parseAsJson,
-  parseAsString,
-  useQueryState,
-} from "nuqs";
-
-import { z } from "zod";
+import { parseAsString, useQueryState } from "nuqs";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { productColumns } from "@/features/admin/products/components/ProductsColumns";
-import { Product } from "@/features/admin/products/types";
+import {
+  fetchProductsQuery,
+  ProductQueryInput,
+} from "@/features/admin/products/action";
 
-export default function ProductsDataTable({ data }: { data: Product[] }) {
+interface ProductsDataTableProps {
+  initialQueryInput: ProductQueryInput;
+}
+
+export default function ProductsDataTable({
+  initialQueryInput,
+}: ProductsDataTableProps) {
   const [title] = useQueryState("title", parseAsString.withDefault(""));
-  const [price] = useQueryState(
-    "price",
-    parseAsArrayOf(parseAsString).withDefault([]),
-  );
+  // const [price] = useQueryState(
+  //   "price",
+  //   parseAsArrayOf(parseAsString).withDefault([]),
+  // );
+  //
+  // const sortingStateSchema = z.array(
+  //   z.object({
+  //     id: z.string(),
+  //     desc: z.boolean(),
+  //   }),
+  // );
 
-  const sortingStateSchema = z.array(
-    z.object({
-      id: z.string(),
-      desc: z.boolean(),
-    }),
-  );
-
-  // Define the parser for SortingState (JSON array)
-  const sortParser = parseAsJson(sortingStateSchema.parse);
-  const [sort] = useQueryState("sort", sortParser.withDefault([]));
-
-  // Ideally we would filter the data server-side, but for the sake of this example, we'll filter the data client-side
-  const filteredData = React.useMemo(() => {
-    return data.filter((product) => {
-      const matchesTitle =
-        title === "" ||
-        product.title.toLowerCase().includes(title.toLowerCase());
-      const matchesPrice =
-        price.length === 0 || price.includes(product.price.toString());
-
-      console.log({
-        sort,
-      });
-
-      return matchesTitle && matchesPrice;
-    });
-  }, [title, price]);
+  const currentQueryInput: ProductQueryInput = {
+    title: title || undefined,
+  };
+  const queryKey = ["products", JSON.stringify(initialQueryInput)];
+  const { data } = useSuspenseQuery({
+    queryKey: queryKey,
+    // The queryFn is technically optional here if data is always hydrated,
+    // but good practice to include for refetching, background updates etc.
+    // It should ideally match the server's fetching logic.
+    queryFn: async () => fetchProductsQuery(currentQueryInput),
+    // Data is provided by hydration initially
+    initialData: () => {
+      // Access the prefetched data from the cache if needed,
+      // but hydration boundary usually handles this.
+      // If you passed data directly as a prop: initialData: initialDataProp
+      return undefined; // Rely on HydrationBoundary
+    },
+    staleTime: 60 * 1000, // Match server staleTime or set as needed
+  });
 
   const columns = React.useMemo(() => productColumns, []);
 
   const { table } = useDataTable({
-    data: filteredData,
+    data,
     columns,
     pageCount: 1,
     initialState: {
