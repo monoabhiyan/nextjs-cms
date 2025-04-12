@@ -1,1 +1,1 @@
-export const productsQueryKey = ["products"];
+export const productsQueryKey = "products";

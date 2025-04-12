@@ -42,7 +42,7 @@ export default async function ProductServerComponent({
   };
 
   await queryClient.prefetchQuery({
-    queryKey: productsQueryKey,
+    queryKey: [productsQueryKey, queryInput],
     queryFn: () => fetchProductsQuery(queryInput),
   });
 

@@ -7,19 +7,21 @@ import { DataTableToolbar } from "@/components/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
 
 import { parseAsJson, parseAsString, useQueryState } from "nuqs";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+} from "@tanstack/react-query";
 import { productColumns } from "@/features/admin/products/components/ProductsColumns";
 import {
   fetchProductsQuery,
   ProductQueryInput,
 } from "@/features/admin/products/action";
-import { useEffect, useMemo } from "react";
-import { getQueryClient } from "@/lib/react-query/QueryProviders";
-import { productsQueryKey } from "@/features/admin/products/constants";
+import { useMemo } from "react";
 import { sortingStateSchema } from "@/features/admin/products/schema";
+import TopLoader from "@/components/TopLoader";
+import { productsQueryKey } from "@/features/admin/products/constants";
 
 export default function ProductsDataTable() {
-  const queryClient = getQueryClient();
   // const [price] = useQueryState(
   //   "price",
   //   parseAsArrayOf(parseAsString).withDefault([]),
@@ -38,8 +40,15 @@ export default function ProductsDataTable() {
     };
   }, [sort, perPage]);
 
-  const { data } = useSuspenseQuery({
-    queryKey: productsQueryKey,
+  // this change in currentQueryInput will re fetch the products
+  const queryKey = useMemo(
+    () => [productsQueryKey, currentQueryInput],
+    [currentQueryInput],
+  );
+
+  const { data, isFetching } = useQuery({
+    placeholderData: keepPreviousData,
+    queryKey,
     // The queryFn is technically optional here if data is always hydrated,
     // but good practice to include for refetching, background updates etc.
     // It should ideally match the server's fetching logic.
@@ -54,16 +63,10 @@ export default function ProductsDataTable() {
     staleTime: 60 * 1000, // Match server staleTime or set as needed
   });
 
-  useEffect(() => {
-    queryClient.invalidateQueries({
-      queryKey: ["products"],
-    });
-  }, [currentQueryInput, queryClient]);
-
   const columns = React.useMemo(() => productColumns, []);
 
   const { table } = useDataTable({
-    data,
+    data: data || [],
     columns,
     pageCount: 1,
     initialState: {
@@ -74,15 +77,18 @@ export default function ProductsDataTable() {
   });
 
   return (
-    <div className="data-table-container">
-      <DataTable table={table}>
-        <DataTableToolbar table={table}></DataTableToolbar>
-      </DataTable>
-      {/*<DataTable table={table}>
+    <>
+      <TopLoader isLoading={isFetching} />
+      <div className="data-table-container">
+        <DataTable table={table}>
+          <DataTableToolbar table={table}></DataTableToolbar>
+        </DataTable>
+        {/*<DataTable table={table}>
         <DataTableAdvancedToolbar table={table}>
           <DataTableSortList table={table} />
         </DataTableAdvancedToolbar>
       </DataTable>*/}
-    </div>
+      </div>
+    </>
   );
 }
