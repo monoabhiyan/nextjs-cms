@@ -7,10 +7,7 @@ import { DataTableToolbar } from "@/components/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
 
 import { parseAsJson, parseAsString, useQueryState } from "nuqs";
-import {
-  keepPreviousData,
-  useQuery,
-} from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { productColumns } from "@/features/admin/products/components/ProductsColumns";
 import {
   fetchProductsQuery,
@@ -32,13 +29,15 @@ export default function ProductsDataTable() {
 
   const [sort] = useQueryState("sort", sortParser.withDefault([]));
   const [perPage] = useQueryState("perPage", parseAsString.withDefault("10"));
+  const [page] = useQueryState("page", parseAsString.withDefault("1"));
 
   const currentQueryInput: ProductQueryInput = useMemo(() => {
     return {
       sort,
       perPage: perPage.toString(),
+      page: page.toString(),
     };
-  }, [sort, perPage]);
+  }, [page, sort, perPage]);
 
   // this change in currentQueryInput will re fetch the products
   const queryKey = useMemo(
@@ -65,10 +64,22 @@ export default function ProductsDataTable() {
 
   const columns = React.useMemo(() => productColumns, []);
 
+  const pageCount = useMemo(() => {
+    if (!data?.products?.length) return 1;
+    const total = data.total ?? 0;
+    const perPage = parseInt(currentQueryInput.perPage) ?? 0;
+
+    if (total > 0 && perPage > 0) {
+      return Math.ceil(total / perPage);
+    }
+
+    return 1;
+  }, [data?.products?.length, data?.total, currentQueryInput.perPage]);
+
   const { table } = useDataTable({
-    data: data || [],
+    data: data?.products || [],
     columns,
-    pageCount: 1,
+    pageCount: pageCount,
     initialState: {
       sorting: [{ id: "title", desc: true }],
       columnPinning: { right: ["actions"] },

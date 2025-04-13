@@ -42,3 +42,10 @@ export type Meta = {
   barcode: string;
   qrCode: string;
 };
+
+export type ProductsResponse = {
+  products: Product[];
+  total: number;
+  skip: number;
+  limit: number;
+};

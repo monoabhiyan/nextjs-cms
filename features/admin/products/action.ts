@@ -7,7 +7,7 @@ import {
   hasValidationErrors,
   isActionSuccessful,
 } from "@/lib/utils"; // Your Axios instance
-import { Product } from "@/features/admin/products/types";
+import { ProductsResponse } from "@/features/admin/products/types";
 import { actionClient, ActionError } from "@/lib/auth/actions";
 import { sortingStateSchema } from "@/features/admin/products/schema";
 
@@ -18,7 +18,7 @@ const productQuerySchema = z.object({
   price: z.array(z.string()).optional(), // Assuming price filter allows multiple values
   sort: sortingStateSchema,
   // Add other params like pagination if needed
-  // page: z.number().optional().default(1),
+  page: z.string().optional().default("1"),
   perPage: z.string().optional().default("10"),
 });
 
@@ -47,11 +47,21 @@ export const $fetchProductsAction = actionClient
       query.set("limit", inputParams.perPage);
     }
 
+    if (inputParams.page) {
+      // Default page is 1, so skip should be 0 for first page
+      const currentPage = parseInt(inputParams.page, 10) || 1;
+      const recordsPerPage = parseInt(inputParams.perPage, 10) || 10;
+
+      // Skip = (page - 1) * limit
+      const skip = (currentPage - 1) * recordsPerPage;
+      query.set("skip", skip.toString());
+    }
+
     const queryString = query.toString();
     console.log("[SERVER ACTION]: Fetching products with query:", queryString); // For debugging
     try {
       // Use your existing Axios instance or fetch logic
-      const { data } = await Axios.get<{ products: Product[] }>( // Adjust response type if needed
+      const { data } = await Axios.get<ProductsResponse>( // Adjust response type if needed
         `/products?${queryString}`,
       );
       // Consider returning pagination info as well if your API provides it
@@ -62,7 +72,9 @@ export const $fetchProductsAction = actionClient
     }
   });
 
-export const fetchProductsQuery = async (queryInput: ProductQueryInput) => {
+export const fetchProductsQuery = async (
+  queryInput: ProductQueryInput,
+): Promise<ProductsResponse> => {
   console.log("[SERVER ACTION]: Prefetching with input:", queryInput);
   const actionResponse = await $fetchProductsAction(queryInput);
 
@@ -79,7 +91,7 @@ export const fetchProductsQuery = async (queryInput: ProductQueryInput) => {
     }
   }
 
-  return (actionResponse?.data?.products as Product[] | undefined) || [];
+  return (actionResponse?.data as ProductsResponse) || [];
 };
 
 // export const fetchProductsAction = action(

@@ -32,6 +32,10 @@ export default async function ProductServerComponent({
   //   .withDefault([])
   //   .parse(searchParams?.price);
 
+  const page = parseAsString
+    .withDefault("1")
+    .parseServerSide(searchParams?.page as successParsing);
+
   const perPage = parseAsString
     .withDefault("10")
     .parseServerSide(searchParams?.perPage as successParsing);
@@ -39,6 +43,7 @@ export default async function ProductServerComponent({
   const queryInput: ProductQueryInput = {
     sort,
     perPage,
+    page,
   };
 
   await queryClient.prefetchQuery({
