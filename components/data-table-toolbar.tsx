@@ -67,6 +67,7 @@ export function DataTableToolbar<TData>({
     </div>
   );
 }
+
 interface DataTableToolbarFilterProps<TData> {
   column: Column<TData>;
 }

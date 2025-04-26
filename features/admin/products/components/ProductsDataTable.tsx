@@ -17,6 +17,19 @@ import { useMemo } from "react";
 import { sortingStateSchema } from "@/features/admin/products/schema";
 import TopLoader from "@/components/TopLoader";
 import { productsQueryKey } from "@/features/admin/products/constants";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription, DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function ProductsDataTable() {
   // const [price] = useQueryState(
@@ -92,7 +105,41 @@ export default function ProductsDataTable() {
       <TopLoader isLoading={isFetching} />
       <div className="data-table-container">
         <DataTable table={table}>
-          <DataTableToolbar table={table}></DataTableToolbar>
+          <div className="flex items-center gap-2">
+            <DataTableToolbar table={table} />
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus /> Product
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Product</DialogTitle>
+                  <DialogDescription>
+                    Create a product and share details with your customers.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input id="name" value="Pedro Duarte" className="col-span-3" />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Username
+                    </Label>
+                    <Input id="username" value="@peduarte" className="col-span-3" />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="submit">Save changes</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </DataTable>
         {/*<DataTable table={table}>
         <DataTableAdvancedToolbar table={table}>
