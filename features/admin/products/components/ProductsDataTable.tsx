@@ -29,6 +29,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { fetchProductsQuery } from "@/features/admin/products/api/products";
+import { useProductsQuery } from "@/features/admin/products/hooks/useProductsQuery";
 
 export default function ProductsDataTable() {
   // const [price] = useQueryState(
@@ -67,14 +68,7 @@ export default function ProductsDataTable() {
       }),
     [currentQueryInput],
   );
-  const { data, isFetching } = useQuery({
-    placeholderData: keepPreviousData,
-    queryKey,
-    // The queryFn is technically optional here if data is always hydrated,
-    // but good practice to include for refetching, background updates etc.
-    // It should ideally match the server's fetching logic.
-    queryFn: () => fetchProductsQuery(currentQueryInput),
-  });
+  const { data, isFetching } = useQuery(useProductsQuery(currentQueryInput));
 
   const columns = React.useMemo(() => productColumns, []);
 

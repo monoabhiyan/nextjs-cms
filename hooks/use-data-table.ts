@@ -32,6 +32,7 @@ import * as React from "react";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { getSortingStateParser } from "@/lib/parsers";
 import type { ExtendedColumnSort } from "@/types/data-table";
+import { useTransition } from "react";
 
 const PAGE_KEY = "page";
 const PER_PAGE_KEY = "perPage";
@@ -127,16 +128,20 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     };
   }, [page, perPage]);
 
+  const [, paginationTransition] = useTransition();
+
   const onPaginationChange = React.useCallback(
     (updaterOrValue: Updater<PaginationState>) => {
-      if (typeof updaterOrValue === "function") {
-        const newPagination = updaterOrValue(pagination);
-        void setPage(newPagination.pageIndex + 1);
-        void setPerPage(newPagination.pageSize);
-      } else {
-        void setPage(updaterOrValue.pageIndex + 1);
-        void setPerPage(updaterOrValue.pageSize);
-      }
+      paginationTransition(() => {
+        if (typeof updaterOrValue === "function") {
+          const newPagination = updaterOrValue(pagination);
+          void setPage(newPagination.pageIndex + 1);
+          void setPerPage(newPagination.pageSize);
+        } else {
+          void setPage(updaterOrValue.pageIndex + 1);
+          void setPerPage(updaterOrValue.pageSize);
+        }
+      });
     },
     [pagination, setPage, setPerPage],
   );

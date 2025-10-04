@@ -5,8 +5,8 @@ import { keepPreviousData } from "@tanstack/react-query";
 
 export function useProductsQuery(input: ProductQueryInput) {
   return {
+    placeholderData: keepPreviousData,
     queryKey: makeOrdersQueryKey(input),
     queryFn: () => fetchProductsQuery(input),
-    placeholder: keepPreviousData,
   };
 }

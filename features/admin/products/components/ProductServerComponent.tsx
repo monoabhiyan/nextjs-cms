@@ -6,8 +6,12 @@ import { ProductQueryInput } from "@/features/admin/products/action";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { makeProductQueryKey } from "@/features/admin/products/constants";
 import { sortingStateSchema } from "@/features/admin/products/schema";
-import { getQueryClient } from "@/lib/react-query/getQueryClient";
+import {
+  getQueryClient,
+  makeQueryClient,
+} from "@/lib/react-query/getQueryClient";
 import { fetchProductsQuery } from "@/features/admin/products/api/products";
+import { useProductsQuery } from "@/features/admin/products/hooks/useProductsQuery";
 
 type ProductServerComponentProps = {
   searchParams?: ProductQueryInput;
@@ -21,7 +25,7 @@ type successParsing = string | undefined;
 export default async function ProductServerComponent({
   searchParams,
 }: ProductServerComponentProps) {
-  const queryClient = getQueryClient();
+  const queryClient = makeQueryClient();
   const sort = sortParser
     .withDefault([])
     .parseServerSide(searchParams?.sort as successParsing);
@@ -44,10 +48,7 @@ export default async function ProductServerComponent({
     page,
   };
 
-  await queryClient.prefetchQuery({
-    queryKey: makeProductQueryKey(queryInput),
-    queryFn: () => fetchProductsQuery(queryInput),
-  });
+  await queryClient.prefetchQuery(useProductsQuery(queryInput));
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
