@@ -10,26 +10,27 @@ import { parseAsJson, parseAsString, useQueryState } from "nuqs";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { productColumns } from "@/features/admin/products/components/ProductsColumns";
 import {
-  fetchProductsQuery,
   ProductQueryInput,
 } from "@/features/admin/products/action";
 import { useMemo } from "react";
 import { sortingStateSchema } from "@/features/admin/products/schema";
 import TopLoader from "@/components/TopLoader";
-import { productsQueryKey } from "@/features/admin/products/constants";
+import { makeProductQueryKey } from "@/features/admin/products/constants";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 import {
   Dialog,
   DialogContent,
-  DialogDescription, DialogFooter,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { fetchProductsQuery } from "@/features/admin/products/api/products";
 
 export default function ProductsDataTable() {
   // const [price] = useQueryState(
@@ -44,6 +45,7 @@ export default function ProductsDataTable() {
   const [perPage] = useQueryState("perPage", parseAsString.withDefault("10"));
   const [page] = useQueryState("page", parseAsString.withDefault("1"));
 
+  // this change in currentQueryInput will re fetch the products
   const currentQueryInput: ProductQueryInput = useMemo(() => {
     return {
       sort,
@@ -52,27 +54,22 @@ export default function ProductsDataTable() {
     };
   }, [page, sort, perPage]);
 
-  // this change in currentQueryInput will re fetch the products
   const queryKey = useMemo(
-    () => [productsQueryKey, currentQueryInput],
+    () =>
+      makeProductQueryKey({
+        sort,
+        perPage,
+        page,
+      }),
     [currentQueryInput],
   );
-
   const { data, isFetching } = useQuery({
     placeholderData: keepPreviousData,
     queryKey,
     // The queryFn is technically optional here if data is always hydrated,
     // but good practice to include for refetching, background updates etc.
     // It should ideally match the server's fetching logic.
-    queryFn: async () => fetchProductsQuery(currentQueryInput),
-    // Data is provided by hydration initially
-    initialData: () => {
-      // Access the prefetched data from the cache if needed,
-      // but hydration boundary usually handles this.
-      // If you passed data directly as a prop: initialData: initialDataProp
-      return undefined; // Rely on HydrationBoundary
-    },
-    staleTime: 60 * 1000, // Match server staleTime or set as needed
+    queryFn: () => fetchProductsQuery(currentQueryInput),
   });
 
   const columns = React.useMemo(() => productColumns, []);
@@ -125,13 +122,21 @@ export default function ProductsDataTable() {
                     <Label htmlFor="name" className="text-right">
                       Name
                     </Label>
-                    <Input id="name" value="Pedro Duarte" className="col-span-3" />
+                    <Input
+                      id="name"
+                      value="Pedro Duarte"
+                      className="col-span-3"
+                    />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="username" className="text-right">
                       Username
                     </Label>
-                    <Input id="username" value="@peduarte" className="col-span-3" />
+                    <Input
+                      id="username"
+                      value="@peduarte"
+                      className="col-span-3"
+                    />
                   </div>
                 </div>
                 <DialogFooter>
