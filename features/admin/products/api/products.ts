@@ -34,6 +34,9 @@ export const getProducts = async (inputParams: ProductQueryInput) => {
   }
 
   const queryString = query.toString();
+
+  console.log(queryString, 'queryString');
+
   const { data } = await Axios.get<ProductsResponse>( // Adjust response type if needed
     `/products?${queryString}`,
   );

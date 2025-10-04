@@ -1,12 +1,13 @@
 import { isServer, QueryClient } from "@tanstack/react-query";
 
 // Use React cache to ensure only one instance per request on the server
-function makeQueryClient() {
+export function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
         // SSR Default options
-        staleTime: 60 * 1000, // 1 minute
+        staleTime: Infinity, // Treat hydrated data as always fresh—no immediate refetch
+        gcTime: 1000 * 60 * 60 * 24, // Keep inactive data for 24h (optional)
       },
     },
   });

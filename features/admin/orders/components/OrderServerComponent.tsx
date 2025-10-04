@@ -1,11 +1,13 @@
-import { getQueryClient } from "@/lib/react-query/getQueryClient";
-import { makeOrdersQueryKey } from "@/features/admin/products/constants";
 import { parseAsJson, parseAsString } from "nuqs/server";
 import { ProductQueryInput } from "@/features/admin/products/action";
 import { sortingStateSchema } from "@/features/admin/products/schema";
-import { fetchProductsQuery } from "@/features/admin/products/api/products";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import OrderClientComponent from "@/features/admin/orders/components/OrderClientComponent";
+import {
+  getQueryClient,
+  makeQueryClient,
+} from "@/lib/react-query/getQueryClient";
+import { useProductsQuery } from "@/features/admin/products/hooks/useProductsQuery";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 // Define the Zod schema for sorting state again (or import if shared)
 const sortParser = parseAsJson(sortingStateSchema.parse);
@@ -16,8 +18,6 @@ export default async function OrderServerComponent({
 }: {
   searchParams?: ProductQueryInput;
 }) {
-  const queryClient = getQueryClient();
-
   const sort = sortParser
     .withDefault([])
     .parseServerSide(searchParams?.sort as successParsing);
@@ -36,10 +36,8 @@ export default async function OrderServerComponent({
     page,
   };
 
-  await queryClient.prefetchQuery({
-    queryKey: makeOrdersQueryKey(queryInput),
-    queryFn: () => fetchProductsQuery(queryInput),
-  });
+  const queryClient = makeQueryClient();
+  await queryClient.prefetchQuery(useProductsQuery(queryInput));
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

@@ -7,10 +7,10 @@ import {
   hasValidationErrors,
   isActionSuccessful,
 } from "@/lib/utils"; // Your Axios instance
-import { ProductsResponse } from "@/features/admin/products/types";
 import { actionClient, ActionError } from "@/lib/auth/actions";
 import { sortingStateSchema } from "@/features/admin/products/schema";
 import { getProducts } from "@/features/admin/products/api/products";
+import { revalidatePath } from "next/cache";
 
 // Define the schema for expected query parameters
 // Match the structure used by nuqs and tanstack table sorting
@@ -37,7 +37,9 @@ export const $fetchProductsAction = actionClient
     }
   });
 
-
+export async function revalidateOrders() {
+  revalidatePath("/admin/orders");
+}
 // export const fetchProductsAction = action(
 //   productQuerySchema,
 //   async (inputParams) => {

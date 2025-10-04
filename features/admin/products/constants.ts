@@ -1,8 +1,4 @@
 import { ProductQueryInput } from "@/features/admin/products/action";
-import { Axios } from "@/lib/utils";
-import { ProductsResponse } from "@/features/admin/products/types";
-
-export const productsQueryKey = "products";
 
 export const makeProductQueryKey = (input: ProductQueryInput) => {
   return [
