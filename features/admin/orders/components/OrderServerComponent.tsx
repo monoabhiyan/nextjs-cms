@@ -2,10 +2,7 @@ import { parseAsJson, parseAsString } from "nuqs/server";
 import { ProductQueryInput } from "@/features/admin/products/action";
 import { sortingStateSchema } from "@/features/admin/products/schema";
 import OrderClientComponent from "@/features/admin/orders/components/OrderClientComponent";
-import {
-  getQueryClient,
-  makeQueryClient,
-} from "@/lib/react-query/getQueryClient";
+import { getQueryClient } from "@/lib/react-query/getQueryClient";
 import { useProductsQuery } from "@/features/admin/products/hooks/useProductsQuery";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
@@ -36,7 +33,7 @@ export default async function OrderServerComponent({
     page,
   };
 
-  const queryClient = makeQueryClient();
+  const queryClient = getQueryClient();
   await queryClient.prefetchQuery(useProductsQuery(queryInput));
 
   return (

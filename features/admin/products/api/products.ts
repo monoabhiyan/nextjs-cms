@@ -1,6 +1,16 @@
-import { Axios, hasServerError, hasValidationErrors, isActionSuccessful } from "@/lib/utils";
+import {
+  Axios,
+  hasServerError,
+  hasValidationErrors,
+  isActionSuccessful,
+} from "@/lib/utils";
 import { ProductsResponse } from "@/features/admin/products/types";
-import { $fetchProductsAction, ProductQueryInput } from "@/features/admin/products/action";
+import {
+  $addProductAction,
+  $fetchProductsAction,
+  AddProductInput,
+  ProductQueryInput,
+} from "@/features/admin/products/action";
 import { ActionError } from "@/lib/auth/actions";
 
 export const getProducts = async (inputParams: ProductQueryInput) => {
@@ -17,6 +27,10 @@ export const getProducts = async (inputParams: ProductQueryInput) => {
     const sortParam = inputParams.sort[0]; // Example: only handle first sort criteria
     query.set("sortBy", sortParam.id);
     query.set("order", sortParam.desc ? "desc" : "asc");
+  } else {
+    // Default sorting if none provided
+    query.set("sortBy", "title");
+    query.set("order", "asc");
   }
 
   if (inputParams.perPage) {
@@ -35,7 +49,7 @@ export const getProducts = async (inputParams: ProductQueryInput) => {
 
   const queryString = query.toString();
 
-  console.log(queryString, 'queryString');
+  console.log(queryString, "queryString");
 
   const { data } = await Axios.get<ProductsResponse>( // Adjust response type if needed
     `/products?${queryString}`,
@@ -49,6 +63,30 @@ export const fetchProductsQuery = async (
 ): Promise<ProductsResponse> => {
   console.log("[SERVER ACTION]: Prefetching with input:", queryInput);
   const actionResponse = await $fetchProductsAction(queryInput);
+
+  if (!isActionSuccessful(actionResponse)) {
+    if (hasValidationErrors(actionResponse)) {
+      console.log("validation error:", actionResponse?.validationErrors);
+      throw new ActionError(String(actionResponse?.validationErrors));
+    }
+    if (hasServerError(actionResponse)) {
+      console.log("server error:", actionResponse?.serverError);
+      throw new ActionError(
+        actionResponse?.serverError ?? "Something went wrong",
+      );
+    }
+  }
+
+  return (actionResponse?.data as ProductsResponse) || [];
+};
+
+export const addProduct = async (input: AddProductInput) => {
+  const { data } = await Axios.post<ProductsResponse>("/products/add", input);
+  return data;
+};
+
+export const addProductQuery = async (input: AddProductInput) => {
+  const actionResponse = await $addProductAction(input);
 
   if (!isActionSuccessful(actionResponse)) {
     if (hasValidationErrors(actionResponse)) {
