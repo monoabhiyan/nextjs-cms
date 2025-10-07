@@ -46,6 +46,12 @@ const routeConfigs: RouteConfig[] = [
     roles: ["user", "admin"],
     redirectTo: "/unauthorized",
   },
+  {
+  pattern: /^\/admin\/seller-cars/,
+  access: "private",
+  roles: ["user", "admin"],
+  redirectTo: "/unauthorized",
+},
 
   // add admin related routes above
   {

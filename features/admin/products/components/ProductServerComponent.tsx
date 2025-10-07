@@ -5,10 +5,7 @@ import { parseAsJson, parseAsString } from "nuqs/server";
 import { ProductQueryInput } from "@/features/admin/products/action";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { sortingStateSchema } from "@/features/admin/products/schema";
-import {
-  getQueryClient,
-  makeQueryClient,
-} from "@/lib/react-query/getQueryClient";
+import { getQueryClient } from "@/lib/react-query/getQueryClient";
 import { useProductsQuery } from "@/features/admin/products/hooks/useProductsQuery";
 
 type ProductServerComponentProps = {

@@ -1,7 +1,9 @@
-import {IconDashboard, IconListDetails} from "@tabler/icons-react";
+import { IconDashboard, IconListDetails } from "@tabler/icons-react";
 
-export const VALIDATION_ERROR_MESSAGE = "An error occurred validating your input.";
-export const DEFAULT_SERVER_ERROR_MESSAGE = "Something went wrong while executing the operation.";
+export const VALIDATION_ERROR_MESSAGE =
+  "An error occurred validating your input.";
+export const DEFAULT_SERVER_ERROR_MESSAGE =
+  "Something went wrong while executing the operation.";
 
 export const adminSideBarData = {
   user: {
@@ -14,6 +16,11 @@ export const adminSideBarData = {
       title: "Dashboard",
       url: "/admin/dashboard",
       icon: IconDashboard,
+    },
+    {
+      title: "Seller Cars",
+      url: "/admin/seller-cars",
+      icon: IconListDetails,
     },
     {
       title: "Products",
@@ -29,6 +36,6 @@ export const adminSideBarData = {
       title: "Projects",
       url: "/admin/projects",
       icon: IconListDetails,
-    }
+    },
   ],
 };

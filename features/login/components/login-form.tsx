@@ -92,7 +92,7 @@ export function LoginForm({
                   id="username"
                   name="username"
                   placeholder="user123"
-                  defaultValue="emilys"
+                  defaultValue="iabhiyaan+7@gmail.com"
                 />
               </div>
               <div className="grid gap-3">
@@ -107,7 +107,7 @@ export function LoginForm({
                 </div>
                 <Input
                   name="password"
-                  defaultValue="emilyspass"
+                  defaultValue="Test@12334"
                   id="password"
                   type="password"
                   required

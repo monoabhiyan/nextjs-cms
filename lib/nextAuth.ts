@@ -10,7 +10,7 @@ export const nextAuthOptions: NextAuthOptions = {
       name: "Credentials",
       async authorize(credentials) {
         try {
-          const response = await Axios.post(`/auth/login`, {
+          const response = await Axios.post(`/seller/login`, {
             username: credentials.username,
             password: credentials.password,
           });
@@ -19,7 +19,9 @@ export const nextAuthOptions: NextAuthOptions = {
 
           if (data) {
             data.role = "admin";
-            return data;
+            data.accessToken = data.access_token;
+            data.userData = data.user;
+            return data; // this resolves into user object in callbacks.jwt
           }
           return null;
         } catch (error) {
@@ -53,6 +55,7 @@ export const nextAuthOptions: NextAuthOptions = {
       if (account?.provider === "credentials") {
         return {
           ...token,
+          id: user.user.id,
           role: user.role,
           accessToken: user.accessToken,
         };

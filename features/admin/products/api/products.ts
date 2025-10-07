@@ -86,7 +86,7 @@ export const addProduct = async (input: AddProductInput) => {
 };
 
 export const addProductQuery = async (input: AddProductInput) => {
-  console.log('[SERVER ACTION]: Adding product with input:', input);
+  console.log("[SERVER ACTION]: Adding product with input:", input);
   const actionResponse = await $addProductAction(input);
 
   if (!isActionSuccessful(actionResponse)) {
